@@ -5,7 +5,7 @@ class WMIMonitor:
 	Watches for serial device addition and removal.
 	"""
 
-	def __init__(self,deviceid,callback=None,timeout=2000,verbose=False):
+	def __init__(self,deviceid,callback=None,timeout=2000,verbose=False,singleThread=False):
 		"""
 		Create a new monitor.  Monitor will spawn a seperate thread for an event loop.
 		Callbacks are called from the event loop thread.
@@ -23,7 +23,10 @@ class WMIMonitor:
 		self._callback = callback
 		self._timeout = timeout
 		self._device = None
-		threading.Thread(target=self._loop).start()
+		if singleThread:
+			self._loop()
+		else:
+			threading.Thread(target=self._loop).start()
 
 	def setCallback(self,callback):
 		"""
@@ -113,3 +116,6 @@ class WMIMonitor:
 				pass
 		if self._verbose:
 			print("WMI: Close WMI")
+
+if __name__ == "__main__":
+	WMIMonitor("",verbose=True,singleThread=True)
