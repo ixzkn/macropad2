@@ -279,8 +279,8 @@ class Manager:
 		# TODO: can be much better
 
 	def printButtonState(self):
-		for k,v in self._dev.buttonState.iteritems():
-			print("    %d: %d" % (k,v))
+		for v in self._dev.buttonState:
+			print(" %d" % v)
 
 	def printLightState(self):
 		for k,v in self._dev.lightState.iteritems():
