@@ -9,7 +9,7 @@ from __future__ import print_function
 # Verbosity for each component, warning: some are very chatty
 verbosity = {
 	'FM': False,
-	'DEV': False,
+	'DEV': True,
 	'WMI': True,
 	'Player': False,
 	'Manager': True
@@ -165,6 +165,7 @@ class Device:
 			print("DEV: Connected")
 		self.buttonState = [False, False, False, False, False]
 		self._callbacks = [callback,callback,callback,callback,callback]
+		self._chord = []
 		self.lightState = {}
 		self._keyboardMode = False
 		self._swget = threading.Event()
@@ -229,9 +230,13 @@ class Device:
 						button = int(data[0].strip())
 						state = int(data[1].strip())
 						self.buttonState[button] = (state == 1)
-						self._callbacks[button](button,state)
-						if self._verbose:
-							print("DEV: Got button: %s" % (line,))
+						if state == 1:
+							self._chord.append(button)
+						if state == 0:
+							if self._verbose:
+								print("DEV: Got button: %s %s" % (line,str(self._chord)))
+							self._callbacks[button](button,state,self._chord)
+							self._chord.remove(button)
 					except:
 						# this can fail all the time
 						if self._verbose:
@@ -268,15 +273,28 @@ class Manager:
 		self._wm = WMIMonitor(self._config['deviceId'],callback=self._connect,verbose=verbosity['WMI'])
 		self.profile = None
 
-	def _button(self,button,state):
-		
-		if (button == 1) and (state == 1):
+	def _button(self,button,state,chord):
+		if chord == [1]:
 			self._foobar.playpause()
-		elif (button == 0) and (state == 1):
+		elif chord == [1,2]:
+			self._foobar.pauseonend()
+		elif chord == [2]:
+			self._foobar.voldown()
+		elif chord == [3]:
+			self._foobar.volup()
+		elif chord == [0]:
 			self._foobar.next()
-		elif (button == 4) and (state == 1):
+		elif chord == [4]:
 			self._foobar.prev()
-		# TODO: can be much better
+		elif chord == [1,0]:
+			self._foobar.rateup()
+		elif chord == [1,4]:
+			self._foobar.ratedown()
+		elif chord == [2,1]:
+			if self._foobar.state("order") == "Shuffle (tracks)":
+				self._foobar.defaultOrder()
+			else:
+				self._foobar.shuffleOrder()
 
 	def printButtonState(self):
 		for v in self._dev.buttonState:
@@ -300,7 +318,10 @@ class Manager:
 
 	def _player(self,state):
 		try:
-			if state["playing"] == "playing":
+			baseRed = 0
+			if state["stopAfter"]:
+				self._dev.setLight(0,(0,0,15))
+			elif state["playing"] == "playing":
 				percent = 0
 				try:
 					percent = int(self._foobar.state("percent"))

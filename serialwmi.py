@@ -77,6 +77,7 @@ class WMIMonitor:
 
 		# check to see if we are already connected
 		for port in self._wm.Win32_SerialPort():
+			print(port.PNPDeviceID)
 			if port.PNPDeviceID.startswith(self._deviceid):
 				self._device = port.DeviceID
 				self.connected = True

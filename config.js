@@ -6,9 +6,9 @@
 	// Executable location:
 	playerExe: "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe",
 	// USB bus id:
-	deviceId: "USB\\VID_1B4F&PID_9204&MI_00\\",
+	deviceId: "USB\\VID_1B4F&PID_9204",
 	// Only used in rare cases WMI cant figure out the device:
-	defaultPort: "COM18",
+	defaultPort: "COM4",
 	// Configured baud rate (must match Arduino code):
 	baudRate: 115200
 }

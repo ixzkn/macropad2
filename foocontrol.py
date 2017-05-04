@@ -10,7 +10,7 @@ class PlayerFoobar:
 		self._verbose = verbose
 		self._callback = callback
 		self._playerExe = playerExe
-		self._laststate = {}
+		self._laststate = {"stopAfter": False}
 		self._prevsong = None
 		self._callbacksong = None
 		self._filemon = FileMonitor.start(infofile,infoformat,callback=self._callbackInt,verbose=verboseFile)
@@ -29,8 +29,21 @@ class PlayerFoobar:
 	def next(self):
 		self._call("/next","Next")
 
+	def rateup(self):
+		subprocess.call("\""+self._playerExe+"\" /runcmd-playing=\"Playback Statistics/Rating/+\"",shell=True)
+
+	def ratedown(self):
+		subprocess.call("\""+self._playerExe+"\" /runcmd-playing=\"Playback Statistics/Rating/-\"",shell=True)
+
+	def pauseonend(self):
+		subprocess.call("\""+self._playerExe+"\" /command:\"Stop after current\"",shell=True)
+		self._laststate["stopAfter"] = not self._laststate["stopAfter"]
+
 	def state(self,key):
-		return self._laststate[key]
+		if key in self._laststate:
+			return self._laststate[key]
+		else:
+			return None
 
 	def _order(self,order):
 		subprocess.call("\""+self._playerExe+"\" /runcmd=\"Playback/Order/"+order+"\"",shell=True)

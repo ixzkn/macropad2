@@ -1,3 +1,4 @@
+// For: 3.3v ProMicro
 #include <Adafruit_NeoPixel.h>
 
 // Parameter 1 = number of pixels in strip
@@ -9,8 +10,8 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(2, 6, NEO_GRB + NEO_KHZ800);
 
-// use 10ms debounce time
-#define DEBOUNCE_TICKS 10
+// use 50ms debounce time
+#define DEBOUNCE_TICKS 50
 
 // switch check rate
 #define SWITCH_TICKS 100
