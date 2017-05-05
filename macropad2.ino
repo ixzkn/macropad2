@@ -90,9 +90,9 @@ void KeyPress4() {
 }
 
 // returns true if key pressed
-boolean KeyPressed(word key) {
+boolean KeyChanged(word key) {
   // second part of OR is for overflow
-  if((lastread[key] < keytick[key] || (lastread[key] - DEBOUNCE_TICKS) > keytick[key]) && (word)millis()-keytick[key] < 30)
+  if((lastread[key] < keytick[key] || (lastread[key] - DEBOUNCE_TICKS) > keytick[key]) && (word)millis()-keytick[key] < 50)
   {
     lastread[key] = keytick[key];
     return true;
@@ -163,7 +163,7 @@ void loopKeyboardMode()
 {
   for(int x=0; x < KEYCOUNT; x++)
   {
-    if(KeyPressed(x))
+    if(KeyChanged(x))
     {
       if(KeyDown(x))
       {
@@ -191,7 +191,7 @@ void loopControllerMode()
 {
   for(int x=0; x < KEYCOUNT; x++)
   {
-    if(KeyPressed(x))
+    if(KeyChanged(x))
     {
       Serial.print(x);
       Serial.print("-");

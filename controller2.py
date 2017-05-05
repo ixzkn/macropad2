@@ -166,6 +166,7 @@ class Device:
 		self.buttonState = [False, False, False, False, False]
 		self._callbacks = [callback,callback,callback,callback,callback]
 		self._chord = []
+		self._chordIgnore = []
 		self.lightState = {}
 		self._keyboardMode = False
 		self._swget = threading.Event()
@@ -230,13 +231,19 @@ class Device:
 						button = int(data[0].strip())
 						state = int(data[1].strip())
 						self.buttonState[button] = (state == 1)
+						print("DEV: " + str(self.buttonState))
 						if state == 1:
 							self._chord.append(button)
+							self._chordIgnore = self._chord[:-1]
 						if state == 0:
-							if self._verbose:
-								print("DEV: Got button: %s %s" % (line,str(self._chord)))
-							self._callbacks[button](button,state,self._chord)
-							self._chord.remove(button)
+							if button not in self._chordIgnore:
+								print("DEV: Callback: %s" % (str(self._chord),))
+								self._callbacks[button](button,state,self._chord)
+								if len(self._chord) == 1:
+									self._chord = []
+							else:
+								self._chord = []
+								self._chordIgnore.remove(button)
 					except:
 						# this can fail all the time
 						if self._verbose:
@@ -278,6 +285,8 @@ class Manager:
 			self._foobar.playpause()
 		elif chord == [1,2]:
 			self._foobar.pauseonend()
+			if self._foobar.state("stopAfter"):
+				self._dev.setLight(0,(0,0,15))
 		elif chord == [2]:
 			self._foobar.voldown()
 		elif chord == [3]:

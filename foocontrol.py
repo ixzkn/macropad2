@@ -39,6 +39,12 @@ class PlayerFoobar:
 		subprocess.call("\""+self._playerExe+"\" /command:\"Stop after current\"",shell=True)
 		self._laststate["stopAfter"] = not self._laststate["stopAfter"]
 
+	def voldown(self):
+		pass
+
+	def volup(self):
+		pass
+
 	def state(self,key):
 		if key in self._laststate:
 			return self._laststate[key]
